@@ -1,0 +1,43 @@
+spring:
+    docker:
+        compose:
+            enabled: false
+
+    datasource:
+        url: jdbc:postgresql://localhost:5432/cloudapp
+        username: puneeth
+        password: puneeth
+        driver-class-name: org.postgresql.Driver
+
+    jpa:
+        hibernate:
+            ddl-auto: create-drop
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+        database: postgresql
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        client-id: 967454326243-1kk0qlcne4khivker9mhandh7ig2f94v.apps.googleusercontent.com
+                        client-secret: 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
+                        scope: profile, email
+                        redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+                provider:
+                    google:
+                        user-name-attribute: sub
+
+    frontend:
+        redirectUrl: http://localhost:4200/oauth2/redirect
+
+aws:
+    region: eu-north-1
+    s3:
+        bucket-name: cloudapp9810
+    access-key: AKIAYCPZ6TOMS7FW36UV
+    secret-key: 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
