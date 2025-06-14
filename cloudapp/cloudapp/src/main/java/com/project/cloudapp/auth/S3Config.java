@@ -18,7 +18,7 @@ public class S3Config {
         return S3Client.builder()
                 .region(Region.of("eu-north-1"))
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("AKIAYCPZ6TOMS7FW36UV", "ME1BNRNpMe4PfConFmymNKXRFF8xjY5DednBZedz")))
+                        AwsBasicCredentials.create("", "")))
                 .build();
     }
 }

@@ -17,7 +17,7 @@ import static javax.crypto.Cipher.SECRET_KEY;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "6f594e6a477a51cfe81503b8b4cffa8d7856401a86a7ff44ffac6886f2a0969f";
+    private static final String SECRET_KEY = "";
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()

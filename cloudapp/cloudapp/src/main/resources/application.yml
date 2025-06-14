@@ -5,8 +5,8 @@ spring:
 
     datasource:
         url: jdbc:postgresql://localhost:5432/cloudapp
-        username: puneeth
-        password: puneeth
+        username: ""
+        password: ""
         driver-class-name: org.postgresql.Driver
 
     jpa:
@@ -24,8 +24,8 @@ spring:
             client:
                 registration:
                     google:
-                        client-id: 967454326243-1kk0qlcne4khivker9mhandh7ig2f94v.apps.googleusercontent.com
-                        client-secret: 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
+                        client-id: ""
+                        client-secret: ""
                         scope: profile, email
                         redirect-uri: "http://localhost:8080/login/oauth2/code/google"
                 provider:
@@ -38,6 +38,6 @@ spring:
 aws:
     region: eu-north-1
     s3:
-        bucket-name: cloudapp9810
-    access-key: AKIAYCPZ6TOMS7FW36UV
-    secret-key: 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
+        bucket-name: ""
+    access-key: ""
+    secret-key: ""
