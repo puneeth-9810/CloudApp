@@ -1,0 +1,84 @@
+name: CI/CD Pipeline for CloudApp
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_USER: ${{ secrets.EC2_USER }}
+  EC2_KEY: ${{ secrets.EC2_KEY }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # -------------------------
+      # Frontend build
+      # -------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build Angular frontend
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build --prod
+
+      # -------------------------
+      # Backend build
+      # -------------------------
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Build Spring Boot backend
+        working-directory: backend
+        run: ./mvnw clean package -DskipTests
+
+      # -------------------------
+      # Docker Build & Push
+      # -------------------------
+      - name: Log in to DockerHub
+        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+      - name: Build and push backend image
+        working-directory: backend
+        run: |
+          docker build -t $DOCKERHUB_USERNAME/cloudapp-backend:latest .
+          docker push $DOCKERHUB_USERNAME/cloudapp-backend:latest
+
+      - name: Build and push frontend image
+        working-directory: frontend
+        run: |
+          docker build -t $DOCKERHUB_USERNAME/cloudapp-frontend:latest .
+          docker push $DOCKERHUB_USERNAME/cloudapp-frontend:latest
+
+      # -------------------------
+      # Remote Deployment on EC2
+      # -------------------------
+      - name: Deploy to EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key: ${{ env.EC2_KEY }}
+          script: |
+            docker pull $DOCKERHUB_USERNAME/cloudapp-backend:latest
+            docker pull $DOCKERHUB_USERNAME/cloudapp-frontend:latest
+            docker stop backend || true && docker rm backend || true
+            docker stop frontend || true && docker rm frontend || true
+            docker run -d --name backend -p 8080:8080 $DOCKERHUB_USERNAME/cloudapp-backend:latest
+            docker run -d --name frontend -p 80:80 $DOCKERHUB_USERNAME/cloudapp-frontend:latest
